@@ -64,7 +64,6 @@ class Queue {
 }
 
 const queue = new Queue();
-
 $(document).ready(function() {
 
     // ENQUEUE
