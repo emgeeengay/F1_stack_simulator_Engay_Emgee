@@ -1,94 +1,138 @@
 
-class Stack {
+class Queue {
     constructor() {
-        this.items = []
-        this.count = 0
-         
+        this.items = [];
+        this.nextId = 0;
     }
 
-    // Add element to top of stack
-    push(element) {
-        this.items[this.count] = element
-        let push_res=`${element}`; //console.log(`added to ${this.count}`);
-        this.count += 1;
-        let count=this.count -1;
-        //return [push_res,count];
-        console.log(push_res);
-        return [push_res, count];
+    // Add element to the rear of the queue
+    enqueue(element) {
+        let newItem = {
+            id: this.nextId++,
+            value: element
+        };
+
+        this.items.push(newItem);
+
+        console.log(`${element} added to queue`);
+        return newItem;
     }
 
-    // Return and remove top element in stack
-    // Return undefined if stack is empty
-    pop() {
-        if(this.count == 0) return undefined
-        let deleteItem = this.items[this.count - 1]
-        this.count -= 1
-        console.log(`${deleteItem} removed`)
-        return deleteItem
-    }
-
-    // Check top element in stack
-    peek() {
-        console.log(`Top element is ${this.items[this.count - 1]}`)
-        return this.items[this.count - 1]
-    }
-
-    // Check if stack is empty
-    isEmpty() {
-        console.log(this.count == 0 ? 'Stack is empty' : 'Stack is NOT empty')
-        return this.count == 0
-    }
-
-    // Check size of stack
-    size() {
-        console.log(`${this.count} elements in stack`)
-        return this.count
-    }
-
-    // Print elements in stack
-    print() {
-        let str = ''
-        for(let i = 0; i < this.count; i++) {
-            str += this.items[i] + ' '
+    // Remove element from the front of the queue
+    dequeue() {
+        if (this.isEmpty()) {
+            return undefined;
         }
-        return str
+
+        let deleteItem = this.items.shift();
+
+        console.log(`${deleteItem.value} removed`);
+        return deleteItem;
     }
 
-    // Clear stack
+    // Check the front element without removing it
+    peek() {
+        if (this.isEmpty()) {
+            return undefined;
+        }
+
+        console.log(`Front element is ${this.items[0].value}`);
+        return this.items[0];
+    }
+
+    // Check if queue is empty
+    isEmpty() {
+        return this.items.length === 0;
+    }
+
+    // Check queue size
+    size() {
+        return this.items.length;
+    }
+
+    // Print queue elements
+    print() {
+        return this.items.map(item => item.value).join(' ');
+    }
+
+    // Clear queue
     clear() {
-        this.items = []
-        this.count = 0
-        console.log('Stack cleared..')
-        return this.items
+        this.items = [];
+        console.log('Queue cleared..');
+        return this.items;
     }
 }
 
-const stack = new Stack()
+const queue = new Queue();
 
-$(document).ready(function(){
-    $("#btn_push").on("click", function(){
-        let push_data = stack.push($("#stack_data").val());
-        $("#stack").prepend(`<div id="st${push_data[0]}" class="row bg-primary push">${push_data}</div>`);
+$(document).ready(function() {
+
+    // ENQUEUE
+    $("#btn_enqueue").on("click", function() {
+
+        let input = $("#queue_data").val().trim();
+
+        if (input === "") {
+            alert("Please enter a value.");
+            return;
+        }
+
+        let enqueue_data = queue.enqueue(input);
+
+        $("#queue").append(
+            `<div id="q${enqueue_data.id}" 
+            class="row bg-primary push text-white border border-light p-2">
+            ${enqueue_data.value}
+            </div>`
+        );
+
+        $("#queue_data").val("");
     });
-    $("#btn_pop").on("click", function(){
-        let pop_data = stack.pop();
-        $("#popped").prepend(`<div class="row pop text-bg-danger border border-light">${pop_data}</div>`);
-        $(`#st${pop_data}`).remove();
+
+    // DEQUEUE
+    $("#btn_dequeue").on("click", function() {
+
+        let dequeue_data = queue.dequeue();
+
+        if (dequeue_data === undefined) {
+            alert("Queue is empty. Nothing to dequeue.");
+            return;
+        }
+
+        $("#deleted").prepend(
+            `<div class="row pop text-bg-danger border border-light p-2">
+            ${dequeue_data.value}
+            </div>`
+        );
+
+        $(`#q${dequeue_data.id}`).remove();
     });
-    $("#btn_peek").on("click", function(){
-        let peek_data = stack.peek();
-        $(`#st${peek_data}`).removeClass("bg-primary").addClass("peek");
-        setTimeout(function(){
-$(`#st${peek_data}`).removeClass("peek").addClass("bg-primary");
+
+    // PEEK
+    $("#btn_peek").on("click", function() {
+
+        let peek_data = queue.peek();
+
+        if (peek_data === undefined) {
+            alert("Queue is empty. Nothing to peek.");
+            return;
+        }
+
+        let frontItem = $(`#q${peek_data.id}`);
+
+        frontItem.removeClass("bg-primary").addClass("peek");
+
+        setTimeout(function() {
+            frontItem.removeClass("peek").addClass("bg-primary");
         }, 500);
     });
-    $("#btn_clear").on("click", function(){
-        stack.clear();
-        $("#stack, #popped").empty();
+
+    // CLEAR
+    $("#btn_clear").on("click", function() {
+
+        queue.clear();
+
+        $("#queue, #deleted").empty();
     });
 
-    // $("#stack").prepend(`<div class="row bg-primary push">${stack.push(100)[0]}</div>`);
-    // $("#stack").prepend(`<div class="row bg-success push">${stack.push(200)[0]}</div>`);
-    // $("#stack").prepend(`<div class="row bg-primary push">${stack.push(300)[0]}</div>`);
-    // $("#stack").prepend(`<div class="row bg-success push">${stack.push(400)[0]}</div>`);
 });
